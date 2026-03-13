@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Didactic OCR & Markdown Comparison</title>
+    <!-- Um pouco de estilo moderno para ficar bonito no seu Mac -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Biblioteca levinha para converter o Markdown em HTML pro navegador exibir -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🔍 Observatório PDF → Markdown & OCR</h1>
+            <p>Compare lado-a-lado o resultado de várias IA's lendo os mesmos documentos (M3 Max Edition).</p>
+        </div>
+    </header>
+
+    <main>
+        <!-- Controle de Seleção do PDF e da Ferramenta -->
+        <section class="controls">
+            <div class="control-group">
+                <label for="pdfSelector">Documento Base:</label>
+                <select id="pdfSelector">
+                    <!-- Preenchido via JS, vamos colocar nomes hardcoded temporariamente -->
+                    <option value="005 - Parada cardiorrespiratória na criança">005 - Parada CPR Criança</option>
+                    <option value="006 - Insuficiência respiratória aguda">006 - Insuficiência Respiratória</option>
+                    <option value="007 - Ventilação mecânica na emergência">007 - Ventilação Mecânica</option>
+                    <option value="26. Pediatric Airway Techniques">26. Pediatric Airway</option>
+                    <option value="27. The Difficult Pediatric Airway">27. Difficult Pediatric</option>
+                    <option value="28. Foreign Body in the Pediatric Airway">28. Foreign Body</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <button id="btnCompare">Carregar Lado a Lado</button>
+            </div>
+        </section>
+
+        <!-- Onde as comparações vão aparecer -->
+        <section class="comparison-grid" id="comparisonGrid">
+            
+            <!-- Coluna 1 -->
+            <div class="tool-column">
+                <h3>Ferramenta Esquerda</h3>
+                <select class="tool-selector" id="toolLeft">
+                    <optgroup label="Estruturais (PDF->MD)">
+                        <option value="marker">Marker</option>
+                        <option value="mineru">MinerU</option>
+                        <option value="docling">Docling</option>
+                        <option value="markitdown">MarkItDown</option>
+                    </optgroup>
+                    <optgroup label="Visão/Nuvem (LLMs)">
+                        <option value="cloud_apis/openai">OpenAI (GPT-4o)</option>
+                        <option value="cloud_apis/gemini">Gemini (Pro/Flash)</option>
+                    </optgroup>
+                    <optgroup label="Texto/OCR Puro">
+                        <option value="ocr_engines/surya">Surya</option>
+                        <option value="ocr_engines/tesseract">Tesseract</option>
+                        <option value="ocr_engines/easyocr">EasyOCR</option>
+                    </optgroup>
+                </select>
+                <div class="result-content" id="contentLeft">
+                    Aguardando...
+                </div>
+            </div>
+
+            <!-- Coluna 2 -->
+            <div class="tool-column">
+                <h3>Ferramenta Direita</h3>
+                <select class="tool-selector" id="toolRight">
+                    <optgroup label="Estruturais (PDF->MD)">
+                        <option value="docling">Docling</option>
+                        <option value="marker">Marker</option>
+                        <option value="mineru">MinerU</option>
+                        <option value="markitdown">MarkItDown</option>
+                    </optgroup>
+                    <optgroup label="Visão/Nuvem (LLMs)">
+                        <option value="cloud_apis/openai" selected>OpenAI (GPT-4o)</option>
+                        <option value="cloud_apis/gemini">Gemini (Pro/Flash)</option>
+                    </optgroup>
+                    <optgroup label="Texto/OCR Puro">
+                        <option value="ocr_engines/surya">Surya</option>
+                        <option value="ocr_engines/tesseract">Tesseract</option>
+                        <option value="ocr_engines/easyocr">EasyOCR</option>
+                    </optgroup>
+                </select>
+                <div class="result-content" id="contentRight">
+                    Aguardando...
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+/* Variáveis de Cores Premium (Modo Escuro com tons neons subtis) */
+:root {
+    --bg-color: #0d1117;
+    --bg-card: #161b22;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --accent-blue: #58a6ff;
+    --accent-glow: rgba(88, 166, 255, 0.4);
+    --border-color: #30363d;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+header {
+    background: linear-gradient(180deg, rgba(88,166,255,0.1) 0%, rgba(13,17,23,0) 100%);
+    padding: 2rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+header h1 {
+    font-size: 2rem;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: var(--text-secondary);
+}
+
+main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Controles */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    background-color: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    align-items: flex-end;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+select, button {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+select:hover {
+    border-color: var(--text-secondary);
+}
+
+select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+button {
+    background-color: var(--accent-blue);
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+button:hover {
+    background-color: #79c0ff;
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Grid de Comparação */
+.comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.tool-column {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tool-column h3 {
+    padding: 1rem 1.5rem 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.tool-selector {
+    margin: 0 1.5rem 1rem;
+    width: calc(100% - 3rem);
+}
+
+/* Área onde o Markdown Renderizado aparece */
+.result-content {
+    flex-grow: 1;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    height: 600px;
+    overflow-y: auto;
+    font-size: 0.95rem;
+}
+
+/* Estilizando o Markdown gerado (como tabelas e títulos) */
+.result-content h1, 
+.result-content h2, 
+.result-content h3 {
+    color: #fff;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.3em;
+}
+
+.result-content p {
+    margin-bottom: 1rem;
+}
+
+.result-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+.result-content th, 
+.result-content td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.result-content th {
+    background-color: var(--bg-card);
+    font-weight: 600;
+}
+
+.result-content img {
+    max-width: 100%;
+    border-radius: 6px;
+}
+
+.result-content pre {
+    background-color: var(--bg-card);
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
+.result-content code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.85em;
+    background-color: rgba(110,118,129,0.4);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}

@@ -1,0 +1,20 @@
+# Ignorar arquivos temporários do Mac e do sistema
+.DS_Store
+__pycache__/
+*.pyc
+
+# Ignorar o ambiente virtual
+venv/
+.venv/
+
+# Ignorar as chaves e arquivos de ambiente locais
+.env
+.secrets
+
+# Ignorar os PDFs de entrada
+input/
+
+# Ignorar as pastas de resultados se desejar não poluir o git,
+# mas como queremos visualizar os resultados, talvez queiramos manter o markdown gerado no GitHub.
+# Se quiser ignorar as extrações depois, descomente as linhas abaixo:
+# docs/results/
