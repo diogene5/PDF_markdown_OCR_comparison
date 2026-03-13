@@ -1,9 +1,9 @@
 # Codex Checkpoint
 
-- Atualizado em: `2026-03-13 18:19:16 -03`
+- Atualizado em: `2026-03-13 18:22:11 -03`
 - Projeto: `PDF_markdown_OCR_comparison`
 - Branch ativa: `codex-runner-hardening-diagnostics`
-- Ultimo commit local: `6716d72` - `Improve results UX, fix Surya/MarkItDown, and add practical guide`
+- Ultimo commit local: `a10e7b6` - `Add a durable Codex checkpoint and resume workflow`
 - PR ativa: `#1` - `Harden runners and document environment diagnostics`
 - URL da PR: `https://github.com/diogene5/PDF_markdown_OCR_comparison/pull/1`
 
@@ -13,7 +13,7 @@
 - O runner do Gemini foi atualizado para usar um modelo atual e o smoke test curto passou.
 - `surya` foi alinhado ao CLI instalado e `markitdown` passou a depender explicitamente do extra de PDF.
 - O projeto ganhou manifesto real de resultados, arquivos consolidados `document.md` e um observatorio visual em `docs/`.
-- O ultimo bloco funcional ja esta commitado localmente, mas a branch ainda esta `ahead 1` do remoto.
+- Os dois ultimos blocos funcionais ja estao commitados localmente, e a branch agora esta `ahead 2` do remoto.
 - `docs/results/` continua como saida local gerada e nao deve entrar nos commits.
 
 ## Bloco atual
@@ -25,7 +25,7 @@
 ## Proximos passos provaveis
 
 1. Rodar `./scripts/codex_resume.sh` quando retomar o projeto.
-2. Fazer `git push` para publicar o commit `6716d72` e atualizar a PR `#1`.
+2. Fazer `git push` para publicar os commits locais `6716d72` e `a10e7b6` e atualizar a PR `#1`.
 3. Antes de qualquer teste longo, rodar `./scripts/codex_pre_long_test.sh "descricao do teste"`.
 4. Depois do teste, atualizar este arquivo com resultado curto e decidir se fecha outro bloco de commit.
 
@@ -95,3 +95,4 @@ Cada bloco deve responder tres perguntas:
 - `2026-03-13 18:19:16 -03` - checkpoint inicial criado com estado atual da branch, PR e rotina de retomada.
 - `2026-03-13 18:20:51 -03` - antes de teste longo: smoke test da rotina de checkpoint | branch `codex-runner-hardening-diagnostics` | commit `6716d72`
 - `2026-03-13 18:21:00 -03` - `./scripts/codex_resume.sh` e `./scripts/codex_pre_long_test.sh` executados com sucesso.
+- `2026-03-13 18:22:11 -03` - commit `a10e7b6` criado para fechar o bloco de retomada segura.
