@@ -32,6 +32,25 @@ Durante a execução completa com `run.sh`, o problema deixou de ser só ambient
 - Menor chance de o macOS mostrar alerta de memória esgotada.
 - Se uma API travar, aquela página falha e o processo pode seguir.
 
+## Atualização: desalinhamentos encontrados na segunda rodada
+
+Depois da correção de memória, apareceram mais 4 problemas práticos:
+
+1. `surya_ocr` estava sendo chamado com argumentos de uma versão antiga do CLI.
+2. `markitdown` estava instalado sem o extra de PDF, então o import passava, mas a conversão de PDF falhava.
+3. A interface em `docs/index.html` tentava adivinhar caminhos de saída e por isso perdia resultados reais, principalmente de `mineru` e `markitdown`.
+4. As saídas por página (`page_0.md`, `page_1.txt`, etc.) não geravam um documento único consolidado.
+
+### Correções aplicadas
+
+- [run_ocr_engines.py](../../src/run_ocr_engines.py) agora usa o CLI atual do Surya:
+  `surya_ocr arquivo.pdf --output_dir pasta`
+- [requirements.txt](../../requirements.txt) agora fixa `markitdown[pdf]==0.1.5`
+- `Cloud APIs`, `Tesseract`, `EasyOCR` e `Surya` agora geram também `document.md`
+- Foi criado um manifesto real em `docs/results/manifest.json`
+- A visualização em `docs/index.html` passou a ler esse manifesto em vez de chutar caminhos
+- Foi criado um runner simples para testes isolados: [scripts/run_one.py](../../scripts/run_one.py)
+
 ## Evidências coletadas
 
 ### Python global (`python3`)

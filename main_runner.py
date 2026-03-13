@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from src.environment_diagnostics import build_environment_report, format_environment_report
+from src.results_manifest import write_results_manifest
 from src.run_result import RunResult
 from src.run_marker import run_marker
 from src.run_mineru import run_mineru
@@ -36,6 +37,7 @@ def main():
     # Criar pastas base se não existirem
     input_folder.mkdir(exist_ok=True)
     results_base.mkdir(parents=True, exist_ok=True)
+    write_results_manifest(results_base)
 
     pdfs = list(input_folder.glob("*.pdf"))
     
@@ -72,12 +74,16 @@ def main():
         results.append(run_cloud_apis(pdf_str, str(results_base / "cloud_apis")))
 
         all_results[pdf.name] = results
+        write_results_manifest(results_base)
         print_pdf_summary(pdf.name, results)
         
         print(f"\n✅ Concluído processo para: {pdf.name}\n")
         
     print_final_summary(all_results)
-    print(f"\n🎉 Todos os {len(pdfs)} PDFs foram processados! Abra o 'docs/index.html' para comparar.")
+    manifest_path = write_results_manifest(results_base)
+    print(f"\n🎉 Todos os {len(pdfs)} PDFs foram processados!")
+    print(f"📄 Manifesto atualizado em: {manifest_path}")
+    print("🌐 Para comparar visualmente, sirva a pasta docs/ com: python3 -m http.server 8000 -d docs")
 
 if __name__ == "__main__":
     main()

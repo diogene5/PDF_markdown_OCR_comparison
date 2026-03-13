@@ -3,95 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Didactic OCR & Markdown Comparison</title>
-    <!-- Um pouco de estilo moderno para ficar bonito no seu Mac -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Observatório PDF → Markdown</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Biblioteca levinha para converter o Markdown em HTML pro navegador exibir -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <h1>🔍 Observatório PDF → Markdown & OCR</h1>
-            <p>Compare lado-a-lado o resultado de várias IA's lendo os mesmos documentos (M3 Max Edition).</p>
+    <header class="hero">
+        <div class="hero-copy">
+            <p class="eyebrow">Observatório local</p>
+            <h1>PDF → Markdown e OCR, com comparação de verdade</h1>
+            <p class="hero-text">
+                Esta página mostra o que cada ferramenta realmente gerou no disco. Nada aqui adivinha caminho.
+                Se o arquivo existe, aparece. Se não existe, fica marcado como indisponível.
+            </p>
         </div>
+        <aside class="hero-panel">
+            <p class="panel-title">Fluxo rápido</p>
+            <ol>
+                <li><code>source ~/.secrets</code></li>
+                <li><code>./run.sh</code></li>
+                <li><code>./scripts/serve_docs.sh</code></li>
+                <li>Abrir <code>http://localhost:8000</code></li>
+            </ol>
+        </aside>
     </header>
 
     <main>
-        <!-- Controle de Seleção do PDF e da Ferramenta -->
-        <section class="controls">
-            <div class="control-group">
-                <label for="pdfSelector">Documento Base:</label>
-                <select id="pdfSelector">
-                    <!-- Preenchido via JS, vamos colocar nomes hardcoded temporariamente -->
-                    <option value="005 - Parada cardiorrespiratória na criança">005 - Parada CPR Criança</option>
-                    <option value="006 - Insuficiência respiratória aguda">006 - Insuficiência Respiratória</option>
-                    <option value="007 - Ventilação mecânica na emergência">007 - Ventilação Mecânica</option>
-                    <option value="26. Pediatric Airway Techniques">26. Pediatric Airway</option>
-                    <option value="27. The Difficult Pediatric Airway">27. Difficult Pediatric</option>
-                    <option value="28. Foreign Body in the Pediatric Airway">28. Foreign Body</option>
-                </select>
+        <section class="guide-grid">
+            <article class="guide-card">
+                <h2>Rodar tudo</h2>
+                <p>Processa todos os PDFs da pasta <code>input/</code> e atualiza o manifesto da visualização.</p>
+                <pre><code>./run.sh</code></pre>
+            </article>
+            <article class="guide-card">
+                <h2>Testar um PDF solto</h2>
+                <p>Use qualquer PDF fora deste projeto e jogue a saída onde quiser.</p>
+                <pre><code>source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool marker \
+  --input ~/Downloads/exemplo.pdf \
+  --output ~/Desktop/pdf-tests</code></pre>
+            </article>
+            <article class="guide-card">
+                <h2>Aliases sugeridos</h2>
+                <p>Se quiser deixar seu terminal mais prático:</p>
+                <pre><code>alias pdfobs='cd ~/projetos/PDF_markdown_OCR_comparison'
+alias pdfrun='cd ~/projetos/PDF_markdown_OCR_comparison && ./run.sh'
+alias pdfview='cd ~/projetos/PDF_markdown_OCR_comparison && ./scripts/serve_docs.sh'</code></pre>
+            </article>
+        </section>
+
+        <section class="legend">
+            <div>
+                <strong>Leitura rápida:</strong> `document.md` = documento consolidado. `page_X.*` = saída por página.
             </div>
-            
-            <div class="control-group">
-                <button id="btnCompare">Carregar Lado a Lado</button>
+            <div>
+                <strong>Use `Marker` e `MinerU`</strong> quando quiser layout e figuras. Use `Docling` quando quiser markdown limpo.
             </div>
         </section>
 
-        <!-- Onde as comparações vão aparecer -->
-        <section class="comparison-grid" id="comparisonGrid">
-            
-            <!-- Coluna 1 -->
-            <div class="tool-column">
-                <h3>Ferramenta Esquerda</h3>
-                <select class="tool-selector" id="toolLeft">
-                    <optgroup label="Estruturais (PDF->MD)">
-                        <option value="marker">Marker</option>
-                        <option value="mineru">MinerU</option>
-                        <option value="docling">Docling</option>
-                        <option value="markitdown">MarkItDown</option>
-                    </optgroup>
-                    <optgroup label="Visão/Nuvem (LLMs)">
-                        <option value="cloud_apis/openai">OpenAI (GPT-4o)</option>
-                        <option value="cloud_apis/gemini">Gemini (Pro/Flash)</option>
-                    </optgroup>
-                    <optgroup label="Texto/OCR Puro">
-                        <option value="ocr_engines/surya">Surya</option>
-                        <option value="ocr_engines/tesseract">Tesseract</option>
-                        <option value="ocr_engines/easyocr">EasyOCR</option>
-                    </optgroup>
-                </select>
-                <div class="result-content" id="contentLeft">
-                    Aguardando...
-                </div>
+        <section class="controls">
+            <div class="control-group control-wide">
+                <label for="pdfSelector">PDF</label>
+                <select id="pdfSelector"></select>
             </div>
-
-            <!-- Coluna 2 -->
-            <div class="tool-column">
-                <h3>Ferramenta Direita</h3>
-                <select class="tool-selector" id="toolRight">
-                    <optgroup label="Estruturais (PDF->MD)">
-                        <option value="docling">Docling</option>
-                        <option value="marker">Marker</option>
-                        <option value="mineru">MinerU</option>
-                        <option value="markitdown">MarkItDown</option>
-                    </optgroup>
-                    <optgroup label="Visão/Nuvem (LLMs)">
-                        <option value="cloud_apis/openai" selected>OpenAI (GPT-4o)</option>
-                        <option value="cloud_apis/gemini">Gemini (Pro/Flash)</option>
-                    </optgroup>
-                    <optgroup label="Texto/OCR Puro">
-                        <option value="ocr_engines/surya">Surya</option>
-                        <option value="ocr_engines/tesseract">Tesseract</option>
-                        <option value="ocr_engines/easyocr">EasyOCR</option>
-                    </optgroup>
-                </select>
-                <div class="result-content" id="contentRight">
-                    Aguardando...
-                </div>
+            <div class="control-group">
+                <label for="toolLeft">Painel esquerdo</label>
+                <select id="toolLeft" data-default-tool="marker"></select>
             </div>
+            <div class="control-group">
+                <label for="toolRight">Painel direito</label>
+                <select id="toolRight" data-default-tool="cloud_apis/openai"></select>
+            </div>
+            <div class="control-group">
+                <label>&nbsp;</label>
+                <button id="refreshButton" type="button">Atualizar dados</button>
+            </div>
+        </section>
 
+        <section class="status-section">
+            <div class="status-header">
+                <h2>Disponibilidade para este PDF</h2>
+                <p id="manifestStamp">Carregando manifesto...</p>
+            </div>
+            <div id="statusGrid" class="status-grid"></div>
+        </section>
+
+        <section class="comparison-grid">
+            <article class="viewer-panel">
+                <div class="panel-header">
+                    <h2 id="leftTitle">Painel esquerdo</h2>
+                    <p id="leftMeta" class="panel-meta"></p>
+                </div>
+                <div id="contentLeft" class="result-content">Carregando...</div>
+            </article>
+            <article class="viewer-panel">
+                <div class="panel-header">
+                    <h2 id="rightTitle">Painel direito</h2>
+                    <p id="rightMeta" class="panel-meta"></p>
+                </div>
+                <div id="contentRight" class="result-content">Carregando...</div>
+            </article>
         </section>
     </main>
 

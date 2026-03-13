@@ -1,47 +1,114 @@
-# Comparador Didático: PDF → Markdown & OCR
+# Comparador de PDF → Markdown e OCR
 
-Bem-vindo ao observatório de **Extração de Texto e Estrutura**! 
-Este repositório foi criado para aprender e comparar didaticamente como diferentes ferramentas de Inteligência Artificial e OCR interpretam e convertem arquivos PDF estruturados (com tabelas, títulos e formatações).
+Este projeto compara como diferentes ferramentas transformam o mesmo PDF em:
 
-## 🛠 Arquitetura do Projeto
+- markdown estruturado
+- OCR puro
+- interpretação visual por modelos de nuvem
 
-Aqui usamos uma abordagem separada para cada "família" de ferramentas:
+## Visão geral
 
 ```mermaid
-graph TD
-    A[PDF de Entrada] --> B(Conversores Locais Estruturais)
-    A --> C(Motores de OCR Puros)
-    A --> D(Modelos de Visão na Nuvem - VLMs)
-
-    B -->|Marker, Docling, MarkItDown| E[Markdown com Estrutura Preservada]
-    C -->|Surya, Tesseract, EasyOCR| F[Texto Bruto com Alta Fidelidade de Leitura]
-    D -->|OpenAI GPT-4o, Gemini Pro| G[Markdown Inteligente com Correções de Contexto]
-
-    E --> H((Site Comparador Local))
+flowchart TD
+    A[PDF de entrada] --> B[Ferramentas locais estruturais]
+    A --> C[Motores de OCR]
+    A --> D[Modelos de nuvem]
+    B --> E[Markdown]
+    C --> F[Texto OCR]
+    D --> G[Markdown por pagina]
+    E --> H[docs/results]
     F --> H
     G --> H
+    H --> I[docs/results/manifest.json]
+    I --> J[docs/index.html]
 ```
 
-## 🚀 Como reproduzir localmente?
+## Ferramentas comparadas
 
-1. Instale o Python e crie um ambiente virtual: `python3 -m venv venv` e então `source venv/bin/activate`
-2. Instale as dependências Python do projeto: `pip install -r requirements.txt`
-3. Garanta que os CLIs abaixo estejam disponíveis no `PATH` do terminal que vai rodar o projeto:
-   `marker_single`, `mineru`, `surya_ocr`, `tesseract`, `pdftoppm`
-4. Carregue as credenciais de nuvem antes de rodar: `source ~/.secrets`
-5. Rode `./run.sh` para ativar o `venv` correto e executar o fluxo completo.
-6. Se quiser validar o ambiente antes, rode `python3 src/environment_diagnostics.py`.
-7. Abra o `docs/index.html` em seu navegador para comparar os resultados gerados de forma visual.
+- `marker`
+- `mineru`
+- `docling`
+- `markitdown`
+- `surya`
+- `tesseract`
+- `easyocr`
+- `openai`
+- `gemini`
 
-## 🧠 Uso de Memória
+## Como rodar tudo
 
-- Os fluxos de `OCR Engines` e `Cloud APIs` agora processam **uma página por vez**, em vez de carregar o PDF inteiro na memória.
-- Se uma API de nuvem demorar demais, o runner interrompe aquela chamada após `API_TIMEOUT_SECONDS` segundos.
-- O valor padrão do timeout é `180`. Se quiser mudar, exporte por exemplo:
-  `export API_TIMEOUT_SECONDS=300`
+1. Crie e ative o ambiente virtual:
 
-## 🧪 Diagnóstico do runner
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-O diagnóstico detalhado do problema encontrado no terminal, com plano de correção e visualização do fluxo, está em:
+2. Instale as dependências:
 
-- `docs/diagnostics/2026-03-13-runner-hardening.md`
+```bash
+pip install -r requirements.txt
+```
+
+3. Carregue as chaves:
+
+```bash
+source ~/.secrets
+```
+
+4. Rode o fluxo completo:
+
+```bash
+./run.sh
+```
+
+## Como abrir a visualização
+
+```bash
+python3 scripts/build_manifest.py
+./scripts/serve_docs.sh
+```
+
+Depois abra `http://localhost:8000`.
+
+## Testar um PDF qualquer fora deste projeto
+
+### Marker
+
+```bash
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool marker \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+### MinerU
+
+```bash
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool mineru \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+## Saídas importantes
+
+- `docs/results/...`: resultados gerados
+- `docs/results/manifest.json`: mapa real do que foi gerado
+- `docs/index.html`: interface visual
+- `document.md`: arquivo consolidado para ferramentas que antes geravam só `page_0`, `page_1`, etc.
+
+## Observações práticas
+
+- `Marker` e `MinerU` costumam ser os melhores para preservar figuras e estrutura.
+- `Docling` tende a produzir markdown mais limpo.
+- `Cloud APIs` e `OCR Engines` agora processam uma página por vez para reduzir uso de memória.
+- `MarkItDown` precisa ser instalado com suporte a PDF: `markitdown[pdf]`.
+- `Surya` depende do CLI atual `surya_ocr ... --output_dir ...`.
+
+## Documentação adicional
+
+- Guia prático: `docs/guia_pratico.md`
+- Diagnóstico do endurecimento do runner: `docs/diagnostics/2026-03-13-runner-hardening.md`

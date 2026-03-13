@@ -18,4 +18,4 @@ echo "🚀 Iniciando as extrações de PDF → Markdown & OCR..."
 echo "🐍 Python ativo: $(which python3)"
 python3 main_runner.py
 
-echo "✅ Pronto! Agora você pode abrir o arquivo 'docs/index.html' no seu navegador para ver os resultados."
+echo "✅ Pronto! Para abrir o observatório visual, rode: python3 -m http.server 8000 -d docs"

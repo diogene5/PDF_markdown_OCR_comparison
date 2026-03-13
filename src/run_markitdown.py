@@ -44,8 +44,14 @@ def run_markitdown(input_pdf: str, output_dir: str) -> RunResult:
         return RunResult("MarkItDown", "success", f"Markdown salvo para '{pdf_path.name}'.", str(output_file_path))
             
     except Exception as e:
-        print(f"❌ Erro ao rodar MarkItDown em '{pdf_path.name}':\n{e}")
-        return RunResult("MarkItDown", "failed", f"Falha ao converter '{pdf_path.name}': {e}")
+        error_text = str(e)
+        if "dependencies needed to read .pdf files have not been installed" in error_text:
+            error_text = (
+                "O pacote `markitdown` foi instalado sem suporte a PDF. "
+                "Reinstale com `pip install 'markitdown[pdf]==0.1.5'`."
+            )
+        print(f"❌ Erro ao rodar MarkItDown em '{pdf_path.name}':\n{error_text}")
+        return RunResult("MarkItDown", "failed", f"Falha ao converter '{pdf_path.name}': {error_text}")
 
 if __name__ == "__main__":
     # Teste rápido se o script for rodado diretamente

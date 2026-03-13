@@ -24,6 +24,7 @@ except ImportError:
 _openai_client = None
 
 from src.run_result import RunResult, combine_status
+from src.output_helpers import combine_page_outputs
 
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "models/gemini-2.5-flash")
 API_TIMEOUT_SECONDS = int(os.environ.get("API_TIMEOUT_SECONDS", "180"))
@@ -214,6 +215,9 @@ def run_cloud_apis(input_pdf: str, output_dir: str) -> RunResult:
             else:
                 success_count += 1
                 messages.append(f"Gemini concluído em {total_pages} página(s).")
+            combined = combine_page_outputs(gemini_dir, title=f"{pdf_path.stem} · Gemini")
+            if combined is not None:
+                messages.append(f"Gemini consolidado em {combined.name}.")
 
         if openai_enabled:
             if openai_failures:
@@ -222,6 +226,9 @@ def run_cloud_apis(input_pdf: str, output_dir: str) -> RunResult:
             else:
                 success_count += 1
                 messages.append(f"OpenAI concluído em {total_pages} página(s).")
+            combined = combine_page_outputs(openai_dir, title=f"{pdf_path.stem} · OpenAI")
+            if combined is not None:
+                messages.append(f"OpenAI consolidado em {combined.name}.")
             
         print(f"✅ Extração VLM Cloud Concluída para '{pdf_path.name}'.")
         

@@ -24,6 +24,7 @@ except Exception as e:
     reader = None
 
 from src.run_result import RunResult, combine_status
+from src.output_helpers import combine_page_outputs, combine_surya_results
 
 
 def iter_pdf_pages(pdf_path: Path):
@@ -98,7 +99,7 @@ def run_ocr_engines(input_pdf: str, output_dir: str) -> RunResult:
             surya_out = results_dir / "surya"
             surya_out.mkdir(exist_ok=True)
             surya_result = subprocess.run(
-                [surya_command, str(pdf_path), "--results_dir", str(surya_out), "--langs", "pt"],
+                [surya_command, str(pdf_path), "--output_dir", str(surya_out)],
                 capture_output=True,
                 text=True,
             )
@@ -109,7 +110,15 @@ def run_ocr_engines(input_pdf: str, output_dir: str) -> RunResult:
                 messages.append(f"Surya falhou: {stderr}")
             else:
                 success_count += 1
-                messages.append("Surya concluído.")
+                results_json = next(surya_out.rglob("results.json"), None)
+                if results_json is None:
+                    messages.append("Surya concluiu, mas não gerou results.json.")
+                else:
+                    combined = combine_surya_results(results_json)
+                    if combined is not None:
+                        messages.append(f"Surya concluído e consolidado em {combined.name}.")
+                    else:
+                        messages.append("Surya concluiu, mas não foi possível consolidar em document.md.")
         except Exception as e:
             failure_count += 1
             messages.append(f"Surya falhou: {e}")
@@ -175,6 +184,9 @@ def run_ocr_engines(input_pdf: str, output_dir: str) -> RunResult:
             else:
                 success_count += 1
                 messages.append(f"Tesseract concluído em {page_count} página(s).")
+            combined = combine_page_outputs(tess_dir, title=f"{pdf_path.stem} · Tesseract")
+            if combined is not None:
+                messages.append(f"Tesseract consolidado em {combined.name}.")
 
             if reader is None:
                 skipped_count += 1
@@ -185,6 +197,9 @@ def run_ocr_engines(input_pdf: str, output_dir: str) -> RunResult:
             else:
                 success_count += 1
                 messages.append(f"EasyOCR concluído em {page_count} página(s).")
+            combined = combine_page_outputs(easy_dir, title=f"{pdf_path.stem} · EasyOCR")
+            if combined is not None:
+                messages.append(f"EasyOCR consolidado em {combined.name}.")
 
     status = combine_status(success_count, failure_count, skipped_count)
     if status == "failed":
