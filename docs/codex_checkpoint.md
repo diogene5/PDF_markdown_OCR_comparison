@@ -3,7 +3,7 @@
 - Atualizado em: `2026-03-13 18:22:11 -03`
 - Projeto: `PDF_markdown_OCR_comparison`
 - Branch ativa: `codex-runner-hardening-diagnostics`
-- Ultimo commit local: `a10e7b6` - `Add a durable Codex checkpoint and resume workflow`
+- Referencia de retomada imediata: rodar `./scripts/codex_resume.sh` para ver o `HEAD` atual
 - PR ativa: `#1` - `Harden runners and document environment diagnostics`
 - URL da PR: `https://github.com/diogene5/PDF_markdown_OCR_comparison/pull/1`
 
@@ -13,7 +13,7 @@
 - O runner do Gemini foi atualizado para usar um modelo atual e o smoke test curto passou.
 - `surya` foi alinhado ao CLI instalado e `markitdown` passou a depender explicitamente do extra de PDF.
 - O projeto ganhou manifesto real de resultados, arquivos consolidados `document.md` e um observatorio visual em `docs/`.
-- Os dois ultimos blocos funcionais ja estao commitados localmente, e a branch agora esta `ahead 2` do remoto.
+- Ha blocos locais ainda nao publicados no remoto; confirme o estado exato com `./scripts/codex_resume.sh`.
 - `docs/results/` continua como saida local gerada e nao deve entrar nos commits.
 
 ## Bloco atual
@@ -25,7 +25,7 @@
 ## Proximos passos provaveis
 
 1. Rodar `./scripts/codex_resume.sh` quando retomar o projeto.
-2. Fazer `git push` para publicar os commits locais `6716d72` e `a10e7b6` e atualizar a PR `#1`.
+2. Fazer `git push` para publicar os commits locais pendentes e atualizar a PR `#1`.
 3. Antes de qualquer teste longo, rodar `./scripts/codex_pre_long_test.sh "descricao do teste"`.
 4. Depois do teste, atualizar este arquivo com resultado curto e decidir se fecha outro bloco de commit.
 
