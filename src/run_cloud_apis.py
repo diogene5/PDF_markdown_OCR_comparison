@@ -15,16 +15,18 @@ except ImportError:
     OpenAI = None
 
 try:
-    from pdf2image import convert_from_path
+    from pdf2image import convert_from_path, pdfinfo_from_path
 except ImportError:
     print("⚠️ Biblioteca 'pdf2image' não encontrada. Execute 'pip install pdf2image'.")
     convert_from_path = None
+    pdfinfo_from_path = None
 
 _openai_client = None
 
 from src.run_result import RunResult, combine_status
 
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "models/gemini-2.5-flash")
+API_TIMEOUT_SECONDS = int(os.environ.get("API_TIMEOUT_SECONDS", "180"))
 
 # Prompt universal focado na sua didática de comparação
 PROMPT = """
@@ -40,6 +42,29 @@ Requisitos Rigorosos:
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
+
+def iter_pdf_pages(pdf_path: Path):
+    if convert_from_path is None or pdfinfo_from_path is None:
+        raise RuntimeError("pdf2image indisponível")
+
+    page_count = int(pdfinfo_from_path(str(pdf_path))["Pages"])
+    for page_number in range(1, page_count + 1):
+        images = convert_from_path(
+            str(pdf_path),
+            first_page=page_number,
+            last_page=page_number,
+            thread_count=1,
+        )
+        if not images:
+            raise RuntimeError(f"Nenhuma imagem foi gerada para a página {page_number}.")
+
+        image = images[0]
+        try:
+            yield page_number - 1, page_count, image
+        finally:
+            image.close()
+            for extra_image in images[1:]:
+                extra_image.close()
 
 def get_openai_client():
     global _openai_client
@@ -67,7 +92,10 @@ def run_gemini(image_path: str, output_path: Path):
         # Faz upload da img pro gemini
         sample_file = genai.upload_file(image_path)
         
-        response = model.generate_content([PROMPT, sample_file])
+        response = model.generate_content(
+            [PROMPT, sample_file],
+            request_options={"timeout": API_TIMEOUT_SECONDS},
+        )
         
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(response.text)
@@ -100,7 +128,8 @@ def run_openai(image_path: str, output_path: Path):
                     ]
                 }
             ],
-            max_tokens=2048
+            max_tokens=2048,
+            timeout=API_TIMEOUT_SECONDS,
         )
         
         with open(output_path, "w", encoding="utf-8") as f:
@@ -116,7 +145,7 @@ def run_cloud_apis(input_pdf: str, output_dir: str) -> RunResult:
     skipped_count = 0
     messages: list[str] = []
 
-    if convert_from_path is None:
+    if convert_from_path is None or pdfinfo_from_path is None:
         message = "Gemini e OpenAI pulados: falta a dependência Python 'pdf2image'."
         print(f"⏭️ {message}")
         return RunResult("Cloud APIs", "skipped", message)
@@ -135,10 +164,6 @@ def run_cloud_apis(input_pdf: str, output_dir: str) -> RunResult:
     print(f"🔄 Extração VLMs (Nuvem): Usando Gemini e GPT-4o para PDF '{pdf_path.name}'...")
     
     try:
-        # Modelos VLM de API geralmente comem imagens.
-        # Poderíamos enviar o PDF via File API, mas para consistência e suporte multi-página granular, converteremos pra imagem.
-        images = convert_from_path(str(pdf_path))
-        
         gemini_dir = results_dir / "gemini"
         openai_dir = results_dir / "openai"
         if gemini_enabled:
@@ -154,26 +179,33 @@ def run_cloud_apis(input_pdf: str, output_dir: str) -> RunResult:
 
         gemini_failures = 0
         openai_failures = 0
+        total_pages = 0
         
-        for i, img in enumerate(images):
+        # Processa uma página por vez para evitar manter o PDF inteiro em memória.
+        for i, total_pages, img in iter_pdf_pages(pdf_path):
+            print(f"  -> Página {i + 1}/{total_pages}")
             temp_img_path = results_dir / f"vlm_temp_{i}.jpg"
-            # Converte pra JPG pq é mais eficiente e mais compatível que PNG
-            img.convert('RGB').save(temp_img_path, "JPEG")
-            
-            # Gemini
-            if gemini_enabled:
-                ok, error = run_gemini(str(temp_img_path), gemini_dir / f"page_{i}.md")
-                if not ok:
-                    gemini_failures += 1
-                    print(f"⚠️ Gemini falhou na página {i} de '{pdf_path.name}': {error}")
-            # OpenAI
-            if openai_enabled:
-                ok, error = run_openai(str(temp_img_path), openai_dir / f"page_{i}.md")
-                if not ok:
-                    openai_failures += 1
-                    print(f"⚠️ OpenAI falhou na página {i} de '{pdf_path.name}': {error}")
-            
-            os.remove(temp_img_path)
+            page_image = img.convert("RGB")
+
+            try:
+                # Converte pra JPG pq é mais eficiente e mais compatível que PNG
+                page_image.save(temp_img_path, "JPEG")
+
+                if gemini_enabled:
+                    ok, error = run_gemini(str(temp_img_path), gemini_dir / f"page_{i}.md")
+                    if not ok:
+                        gemini_failures += 1
+                        print(f"⚠️ Gemini falhou na página {i} de '{pdf_path.name}': {error}")
+
+                if openai_enabled:
+                    ok, error = run_openai(str(temp_img_path), openai_dir / f"page_{i}.md")
+                    if not ok:
+                        openai_failures += 1
+                        print(f"⚠️ OpenAI falhou na página {i} de '{pdf_path.name}': {error}")
+            finally:
+                page_image.close()
+                if temp_img_path.exists():
+                    os.remove(temp_img_path)
 
         if gemini_enabled:
             if gemini_failures:
@@ -181,7 +213,7 @@ def run_cloud_apis(input_pdf: str, output_dir: str) -> RunResult:
                 messages.append(f"Gemini falhou em {gemini_failures} página(s).")
             else:
                 success_count += 1
-                messages.append(f"Gemini concluído em {len(images)} página(s).")
+                messages.append(f"Gemini concluído em {total_pages} página(s).")
 
         if openai_enabled:
             if openai_failures:
@@ -189,7 +221,7 @@ def run_cloud_apis(input_pdf: str, output_dir: str) -> RunResult:
                 messages.append(f"OpenAI falhou em {openai_failures} página(s).")
             else:
                 success_count += 1
-                messages.append(f"OpenAI concluído em {len(images)} página(s).")
+                messages.append(f"OpenAI concluído em {total_pages} página(s).")
             
         print(f"✅ Extração VLM Cloud Concluída para '{pdf_path.name}'.")
         

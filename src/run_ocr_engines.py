@@ -4,10 +4,11 @@ import shutil
 from pathlib import Path
 
 try:
-    from pdf2image import convert_from_path
+    from pdf2image import convert_from_path, pdfinfo_from_path
 except ImportError:
     print("⚠️ Biblioteca 'pdf2image' não encontrada. Execute 'pip install pdf2image'.")
     convert_from_path = None
+    pdfinfo_from_path = None
 
 try:
     import pytesseract
@@ -23,6 +24,30 @@ except Exception as e:
     reader = None
 
 from src.run_result import RunResult, combine_status
+
+
+def iter_pdf_pages(pdf_path: Path):
+    if convert_from_path is None or pdfinfo_from_path is None:
+        raise RuntimeError("pdf2image indisponível")
+
+    page_count = int(pdfinfo_from_path(str(pdf_path))["Pages"])
+    for page_number in range(1, page_count + 1):
+        images = convert_from_path(
+            str(pdf_path),
+            first_page=page_number,
+            last_page=page_number,
+            thread_count=1,
+        )
+        if not images:
+            raise RuntimeError(f"Nenhuma imagem foi gerada para a página {page_number}.")
+
+        image = images[0]
+        try:
+            yield page_number - 1, page_count, image
+        finally:
+            image.close()
+            for extra_image in images[1:]:
+                extra_image.close()
 
 
 def run_tesseract(image, output_path: Path) -> tuple[bool, str | None]:
@@ -91,20 +116,20 @@ def run_ocr_engines(input_pdf: str, output_dir: str) -> RunResult:
             print(f"⚠️ Surya falhou para '{pdf_path.name}': {e}")
 
     # 2. Converte PDF para imagens para Tesseract e EasyOCR.
-    if convert_from_path is None:
+    if convert_from_path is None or pdfinfo_from_path is None:
         skipped_count += 1
         skipped_count += 1
         messages.append("Tesseract e EasyOCR pulados: falta a dependência Python 'pdf2image'.")
     else:
         try:
-            images = convert_from_path(str(pdf_path))
+            page_count = int(pdfinfo_from_path(str(pdf_path))["Pages"])
         except Exception as e:
             failure_count += 1
             failure_count += 1
             messages.append(f"Conversão do PDF para imagem falhou: {e}")
-            images = []
+            page_count = 0
 
-        if images:
+        if page_count:
             tess_dir = results_dir / "tesseract"
             easy_dir = results_dir / "easyocr"
             tess_dir.mkdir(exist_ok=True)
@@ -112,44 +137,54 @@ def run_ocr_engines(input_pdf: str, output_dir: str) -> RunResult:
 
             tesseract_failures = 0
             easyocr_failures = 0
+            page_iteration_failed = False
 
-            for i, img in enumerate(images):
-                temp_img_path = results_dir / f"temp_page_{i}.png"
-                img.save(temp_img_path, "PNG")
+            try:
+                for i, total_pages, img in iter_pdf_pages(pdf_path):
+                    print(f"  -> Página {i + 1}/{total_pages}")
+                    temp_img_path = results_dir / f"temp_page_{i}.png"
+                    try:
+                        img.save(temp_img_path, "PNG")
 
-                if pytesseract is not None:
-                    ok, error = run_tesseract(img, tess_dir / f"page_{i}.txt")
-                    if not ok:
-                        tesseract_failures += 1
-                        print(f"⚠️ Tesseract falhou na página {i} de '{pdf_path.name}': {error}")
+                        if pytesseract is not None:
+                            ok, error = run_tesseract(img, tess_dir / f"page_{i}.txt")
+                            if not ok:
+                                tesseract_failures += 1
+                                print(f"⚠️ Tesseract falhou na página {i} de '{pdf_path.name}': {error}")
 
-                if reader is not None:
-                    ok, error = run_easyocr(str(temp_img_path), easy_dir / f"page_{i}.txt")
-                    if not ok:
-                        easyocr_failures += 1
-                        print(f"⚠️ EasyOCR falhou na página {i} de '{pdf_path.name}': {error}")
-
-                os.remove(temp_img_path)
+                        if reader is not None:
+                            ok, error = run_easyocr(str(temp_img_path), easy_dir / f"page_{i}.txt")
+                            if not ok:
+                                easyocr_failures += 1
+                                print(f"⚠️ EasyOCR falhou na página {i} de '{pdf_path.name}': {error}")
+                    finally:
+                        if temp_img_path.exists():
+                            os.remove(temp_img_path)
+            except Exception as e:
+                page_iteration_failed = True
+                failure_count += 1
+                failure_count += 1
+                messages.append(f"Conversão página-a-página falhou: {e}")
 
             if pytesseract is None:
                 skipped_count += 1
                 messages.append("Tesseract pulado: pacote `pytesseract` indisponível.")
-            elif tesseract_failures:
+            elif tesseract_failures or page_iteration_failed:
                 failure_count += 1
                 messages.append(f"Tesseract falhou em {tesseract_failures} página(s).")
             else:
                 success_count += 1
-                messages.append(f"Tesseract concluído em {len(images)} página(s).")
+                messages.append(f"Tesseract concluído em {page_count} página(s).")
 
             if reader is None:
                 skipped_count += 1
                 messages.append("EasyOCR pulado: pacote/modelo indisponível.")
-            elif easyocr_failures:
+            elif easyocr_failures or page_iteration_failed:
                 failure_count += 1
                 messages.append(f"EasyOCR falhou em {easyocr_failures} página(s).")
             else:
                 success_count += 1
-                messages.append(f"EasyOCR concluído em {len(images)} página(s).")
+                messages.append(f"EasyOCR concluído em {page_count} página(s).")
 
     status = combine_status(success_count, failure_count, skipped_count)
     if status == "failed":

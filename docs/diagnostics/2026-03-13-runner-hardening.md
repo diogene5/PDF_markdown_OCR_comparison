@@ -11,6 +11,27 @@ O traceback original não vinha de erro de sintaxe em `main_runner.py`. O proble
 - No Python global faltavam `pdf2image`, `markitdown`, `easyocr`, `pytesseract` e `google-generativeai`.
 - Havia um bug adicional em [run_mineru.py](../../src/run_mineru.py): o código chamava `magic-pdf`, mas o CLI instalado no `venv` expõe `mineru`.
 
+## Atualização: incidente de memória na execução completa
+
+Durante a execução completa com `run.sh`, o problema deixou de ser só ambiente. O gargalo passou a ser **memória e tempo de espera de rede**:
+
+- [run_cloud_apis.py](../../src/run_cloud_apis.py) carregava todas as páginas do PDF de uma vez com `convert_from_path(...)`.
+- [run_ocr_engines.py](../../src/run_ocr_engines.py) fazia o mesmo para Tesseract e EasyOCR.
+- Em PDFs grandes, isso deixava várias imagens gigantes na RAM ao mesmo tempo.
+- Quando Gemini/OpenAI demoravam a responder, o processo ficava parado segurando toda essa memória.
+
+### Correção aplicada
+
+1. `Cloud APIs` agora converte **uma página por vez** e libera a imagem logo após salvar/processar.
+2. `OCR Engines` agora também converte **uma página por vez**.
+3. Chamadas de Gemini/OpenAI agora usam timeout configurável por `API_TIMEOUT_SECONDS` para não travar indefinidamente.
+
+### Efeito esperado
+
+- Menor pico de RAM.
+- Menor chance de o macOS mostrar alerta de memória esgotada.
+- Se uma API travar, aquela página falha e o processo pode seguir.
+
 ## Evidências coletadas
 
 ### Python global (`python3`)

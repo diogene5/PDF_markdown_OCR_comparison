@@ -33,6 +33,13 @@ graph TD
 6. Se quiser validar o ambiente antes, rode `python3 src/environment_diagnostics.py`.
 7. Abra o `docs/index.html` em seu navegador para comparar os resultados gerados de forma visual.
 
+## 🧠 Uso de Memória
+
+- Os fluxos de `OCR Engines` e `Cloud APIs` agora processam **uma página por vez**, em vez de carregar o PDF inteiro na memória.
+- Se uma API de nuvem demorar demais, o runner interrompe aquela chamada após `API_TIMEOUT_SECONDS` segundos.
+- O valor padrão do timeout é `180`. Se quiser mudar, exporte por exemplo:
+  `export API_TIMEOUT_SECONDS=300`
+
 ## 🧪 Diagnóstico do runner
 
 O diagnóstico detalhado do problema encontrado no terminal, com plano de correção e visualização do fluxo, está em:
