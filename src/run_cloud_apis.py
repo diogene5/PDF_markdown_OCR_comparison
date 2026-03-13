@@ -24,6 +24,8 @@ _openai_client = None
 
 from src.run_result import RunResult, combine_status
 
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "models/gemini-2.5-flash")
+
 # Prompt universal focado na sua didática de comparação
 PROMPT = """
 Você é um avançado motor de Visão Robótica.
@@ -61,7 +63,7 @@ def run_gemini(image_path: str, output_path: Path):
             return False, "Gemini indisponível"
 
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel(GEMINI_MODEL)
         # Faz upload da img pro gemini
         sample_file = genai.upload_file(image_path)
         
