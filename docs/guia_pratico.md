@@ -60,6 +60,32 @@ Depois abra:
 http://localhost:8000
 ```
 
+## Como retomar sem depender da memoria da conversa
+
+Use:
+
+```bash
+./scripts/codex_resume.sh
+```
+
+Esse comando junta num lugar so:
+
+- status do git
+- commits recentes
+- PR da branch atual
+- historico recente do projeto
+- checkpoint vivo em `docs/codex_checkpoint.md`
+
+## Antes de testes longos
+
+Antes de rodar algo que pode demorar ou travar a sessao, rode:
+
+```bash
+./scripts/codex_pre_long_test.sh "descricao do teste longo"
+```
+
+Depois registre o resultado em `docs/codex_checkpoint.md`.
+
 ## Como testar um PDF fora deste projeto
 
 ### Marker
@@ -106,6 +132,8 @@ alias pdfobs='cd ~/projetos/PDF_markdown_OCR_comparison'
 alias pdfrun='cd ~/projetos/PDF_markdown_OCR_comparison && ./run.sh'
 alias pdfview='cd ~/projetos/PDF_markdown_OCR_comparison && ./scripts/serve_docs.sh'
 alias pdfone='cd ~/projetos/PDF_markdown_OCR_comparison && source venv/bin/activate && python3 scripts/run_one.py'
+alias pdfresume='cd ~/projetos/PDF_markdown_OCR_comparison && ./scripts/codex_resume.sh'
+alias pdfcheck='cd ~/projetos/PDF_markdown_OCR_comparison && ./scripts/codex_pre_long_test.sh'
 ```
 
 ## Quando usar cada ferramenta
@@ -143,5 +171,8 @@ surya_ocr arquivo.pdf --output_dir ./saida
 - `main_runner.py`: roda tudo
 - `scripts/run_one.py`: roda um PDF qualquer com ferramentas escolhidas
 - `scripts/serve_docs.sh`: abre a visualização local
+- `scripts/codex_resume.sh`: mostra o estado consolidado para retomada
+- `scripts/codex_pre_long_test.sh`: registra um checkpoint antes de testes longos
 - `docs/results/manifest.json`: mapa real do que foi gerado
 - `docs/index.html`: observatório visual
+- `docs/codex_checkpoint.md`: estado vivo para retomada

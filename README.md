@@ -71,6 +71,24 @@ python3 scripts/build_manifest.py
 
 Depois abra `http://localhost:8000`.
 
+## Retomada segura e testes longos
+
+Quando a sessao ficar longa ou voce for parar e voltar depois, use:
+
+```bash
+./scripts/codex_resume.sh
+```
+
+Esse comando mostra o estado do git, commits recentes, PR da branch atual, sessoes recentes do projeto e o checkpoint operacional em `docs/codex_checkpoint.md`.
+
+Antes de rodar algo demorado, deixe um checkpoint curto:
+
+```bash
+./scripts/codex_pre_long_test.sh "descricao do teste longo"
+```
+
+Depois do teste, atualize `docs/codex_checkpoint.md` com o que aconteceu e, se o bloco fechou, faca um commit antes de mudar de assunto.
+
 ## Testar um PDF qualquer fora deste projeto
 
 ### Marker
@@ -111,4 +129,5 @@ python3 scripts/run_one.py \
 ## Documentação adicional
 
 - Guia prático: `docs/guia_pratico.md`
+- Checkpoint operacional: `docs/codex_checkpoint.md`
 - Diagnóstico do endurecimento do runner: `docs/diagnostics/2026-03-13-runner-hardening.md`
