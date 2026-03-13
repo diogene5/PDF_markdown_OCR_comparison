@@ -13,6 +13,7 @@ venv/
 
 # Ignorar os PDFs de entrada
 input/
+*.pdf
 
 # Ignorar as pastas de resultados se desejar não poluir o git,
 # mas como queremos visualizar os resultados, talvez queiramos manter o markdown gerado no GitHub.

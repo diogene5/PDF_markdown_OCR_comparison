@@ -1,5 +1,6 @@
-import os
 from pathlib import Path
+
+from src.run_result import RunResult
 
 try:
     from markitdown import MarkItDown
@@ -7,7 +8,7 @@ except ImportError:
     print("⚠️ Biblioteca 'markitdown' não encontrada. Execute 'pip install markitdown'.")
     MarkItDown = None
 
-def run_markitdown(input_pdf: str, output_dir: str):
+def run_markitdown(input_pdf: str, output_dir: str) -> RunResult:
     """
     Executa a biblioteca MarkItDown (da Microsoft) para converter de forma rápida (mas mais simples).
     
@@ -16,7 +17,9 @@ def run_markitdown(input_pdf: str, output_dir: str):
         output_dir (str): Caminho para a pasta onde os resultados serão salvos.
     """
     if MarkItDown is None:
-        return
+        message = "Biblioteca Python ausente: markitdown."
+        print(f"⏭️ {message}")
+        return RunResult("MarkItDown", "skipped", message)
         
     pdf_path = Path(input_pdf)
     print(f"🔄 Iniciando a extração do '{pdf_path.name}' usando MarkItDown...")
@@ -38,9 +41,17 @@ def run_markitdown(input_pdf: str, output_dir: str):
             f.write(md_text)
             
         print(f"✅ Sucesso com MarkItDown! Salvo em: {output_file_path}")
+        return RunResult("MarkItDown", "success", f"Markdown salvo para '{pdf_path.name}'.", str(output_file_path))
             
     except Exception as e:
-        print(f"❌ Erro ao rodar MarkItDown em '{pdf_path.name}':\n{e}")
+        error_text = str(e)
+        if "dependencies needed to read .pdf files have not been installed" in error_text:
+            error_text = (
+                "O pacote `markitdown` foi instalado sem suporte a PDF. "
+                "Reinstale com `pip install 'markitdown[pdf]==0.1.5'`."
+            )
+        print(f"❌ Erro ao rodar MarkItDown em '{pdf_path.name}':\n{error_text}")
+        return RunResult("MarkItDown", "failed", f"Falha ao converter '{pdf_path.name}': {error_text}")
 
 if __name__ == "__main__":
     # Teste rápido se o script for rodado diretamente

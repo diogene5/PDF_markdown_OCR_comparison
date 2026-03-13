@@ -1,0 +1,249 @@
+# Guia Prático do Projeto
+
+## O que este projeto faz
+
+Ele pega PDFs e compara como ferramentas diferentes leem o mesmo documento.
+
+Temos 3 famílias principais:
+
+- **Estruturais:** `marker`, `mineru`, `docling`, `markitdown`
+- **OCR puro:** `surya`, `tesseract`, `easyocr`
+- **Modelos de nuvem:** `openai`, `gemini`
+
+## Quando usar cada família
+
+### Estruturais
+
+Use quando você quer um markdown que faça sentido para ler, comparar ou publicar.
+
+Bom para:
+
+- PDFs digitais com texto selecionável
+- documentos com seções, listas e tabelas
+- comparação de qualidade de markdown final
+
+Comece por:
+
+- `marker` se você quer boa preservação de estrutura e figuras
+- `mineru` se o layout é mais complexo
+- `docling` se quer markdown mais limpo
+
+### OCR puro
+
+Use quando o PDF parece um scan, uma foto de página ou um documento em que o principal é "tirar texto da imagem".
+
+Bom para:
+
+- PDF escaneado
+- imagem embutida no PDF
+- texto em página que não vem bem extraído por ferramentas estruturais
+
+Regra prática:
+
+- `surya` para OCR mais forte e mais moderno
+- `tesseract` como baseline simples
+- `easyocr` como comparação extra
+
+### Modelos de nuvem
+
+Use quando você quer que um modelo multimodal interprete visualmente a página e monte um markdown por página.
+
+Bom para:
+
+- comparar "entendimento" visual com OCR local
+- testar tabelas, diagramas e contexto visual
+- casos em que vale pagar API para comparar qualidade
+
+Ruim para:
+
+- lote grande sem controle de custo
+- uso offline
+
+## Fluxo simples
+
+```mermaid
+flowchart LR
+    A["Colocar PDFs em input/"] --> B["Rodar ./run.sh"]
+    B --> C["Gerar resultados em docs/results/"]
+    C --> D["Atualizar results/manifest.json"]
+    D --> E["Abrir o observatório visual em localhost:8000"]
+```
+
+## O que sai em cada pasta
+
+- `docs/results/marker/...`: markdown estruturado + imagens extraídas
+- `docs/results/mineru/...`: markdown estruturado + figuras + artefatos extras
+- `docs/results/docling/...`: markdown limpo
+- `docs/results/markitdown/...`: markdown simples
+- `docs/results/ocr_engines/...`: OCR bruto por motor
+- `docs/results/cloud_apis/...`: markdown por página para Gemini/OpenAI
+
+## Novo padrão para saídas paginadas
+
+Quando uma ferramenta gera `page_0`, `page_1`, `page_2` etc., o projeto agora também monta um arquivo único:
+
+- `document.md`
+
+Exemplos:
+
+- `docs/results/cloud_apis/006 - Insuficiência respiratória aguda/gemini/document.md`
+- `docs/results/ocr_engines/28. Foreign Body in the Pediatric Airway/tesseract/document.md`
+
+## Como rodar tudo
+
+```bash
+source ~/.secrets
+./run.sh
+```
+
+## Como abrir a visualização
+
+```bash
+python3 scripts/build_manifest.py
+./scripts/serve_docs.sh
+```
+
+Depois abra:
+
+```text
+http://localhost:8000
+```
+
+## Como retomar sem depender da memoria da conversa
+
+Use:
+
+```bash
+./scripts/codex_resume.sh
+```
+
+Esse comando junta num lugar so:
+
+- status do git
+- commits recentes
+- PR da branch atual
+- historico recente do projeto
+- checkpoint vivo em `docs/codex_checkpoint.md`
+
+## Antes de testes longos
+
+Antes de rodar algo que pode demorar ou travar a sessao, rode:
+
+```bash
+./scripts/codex_pre_long_test.sh "descricao do teste longo"
+```
+
+Depois registre o resultado em `docs/codex_checkpoint.md`.
+
+## Como testar um PDF fora deste projeto
+
+### Marker
+
+```bash
+cd ~/projetos/PDF_markdown_OCR_comparison
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool marker \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+### MinerU
+
+```bash
+cd ~/projetos/PDF_markdown_OCR_comparison
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool mineru \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+### Surya isolado
+
+```bash
+cd ~/projetos/PDF_markdown_OCR_comparison
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool surya \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+### Rodar vários de uma vez
+
+```bash
+cd ~/projetos/PDF_markdown_OCR_comparison
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool marker \
+  --tool mineru \
+  --tool docling \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+### Rodar OCR completo
+
+```bash
+cd ~/projetos/PDF_markdown_OCR_comparison
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool ocr \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+## Aliases sugeridos
+
+Se fizer sentido para o seu uso diário:
+
+```bash
+alias pdfobs='cd ~/projetos/PDF_markdown_OCR_comparison'
+alias pdfrun='cd ~/projetos/PDF_markdown_OCR_comparison && ./run.sh'
+alias pdfview='cd ~/projetos/PDF_markdown_OCR_comparison && ./scripts/serve_docs.sh'
+alias pdfone='cd ~/projetos/PDF_markdown_OCR_comparison && source venv/bin/activate && python3 scripts/run_one.py'
+alias pdfresume='cd ~/projetos/PDF_markdown_OCR_comparison && ./scripts/codex_resume.sh'
+alias pdfcheck='cd ~/projetos/PDF_markdown_OCR_comparison && ./scripts/codex_pre_long_test.sh'
+```
+
+## Quando usar cada ferramenta
+
+- **Marker:** melhor equilíbrio entre estrutura, tabelas e figuras
+- **MinerU:** muito forte quando há figuras e layout mais complexo
+- **Docling:** muito bom para markdown puro, mais limpo
+- **MarkItDown:** útil como baseline leve, mas depende do extra de PDF instalado
+- **Surya/Tesseract/EasyOCR:** bons para OCR cru, menos bons para layout final
+- **OpenAI/Gemini:** úteis para comparar interpretação visual por página
+
+## Problemas comuns
+
+### `markitdown` não gera nada
+
+Provável causa: instalado sem suporte a PDF.
+
+Correção:
+
+```bash
+source venv/bin/activate
+pip install "markitdown[pdf]==0.1.5"
+```
+
+### `surya` não gera saída
+
+O CLI mudou de versão. Este projeto agora usa o formato correto para a versão atual:
+
+```bash
+surya_ocr arquivo.pdf --output_dir ./saida
+```
+
+## Arquivos importantes
+
+- `main_runner.py`: roda tudo
+- `scripts/run_one.py`: roda um PDF qualquer com ferramentas escolhidas
+- `scripts/serve_docs.sh`: abre a visualização local
+- `scripts/codex_resume.sh`: mostra o estado consolidado para retomada
+- `scripts/codex_pre_long_test.sh`: registra um checkpoint antes de testes longos
+- `docs/results/manifest.json`: mapa real do que foi gerado
+- `docs/index.html`: observatório visual
+- `docs/codex_checkpoint.md`: estado vivo para retomada

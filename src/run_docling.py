@@ -1,5 +1,6 @@
-import os
 from pathlib import Path
+
+from src.run_result import RunResult
 
 # Tentará importar a biblioteca (pode falhar se não instalada ou se houver erro ao importar localmente)
 try:
@@ -8,7 +9,7 @@ except ImportError:
     print("⚠️ Biblioteca 'docling' não encontrada. Verifique se ativou o venv e executou 'pip install docling'.")
     DocumentConverter = None
 
-def run_docling(input_pdf: str, output_dir: str):
+def run_docling(input_pdf: str, output_dir: str) -> RunResult:
     """
     Executa o Docling nativamente via Python para converter um PDF em Markdown.
     
@@ -17,7 +18,9 @@ def run_docling(input_pdf: str, output_dir: str):
         output_dir (str): Caminho para a pasta onde os resultados serão salvos.
     """
     if DocumentConverter is None:
-        return
+        message = "Biblioteca Python ausente: docling."
+        print(f"⏭️ {message}")
+        return RunResult("Docling", "skipped", message)
         
     pdf_path = Path(input_pdf)
     print(f"🔄 Iniciando a extração do '{pdf_path.name}' usando Docling...")
@@ -41,9 +44,11 @@ def run_docling(input_pdf: str, output_dir: str):
             f.write(md_text)
             
         print(f"✅ Sucesso com Docling! Salvo em: {output_file_path}")
+        return RunResult("Docling", "success", f"Markdown salvo para '{pdf_path.name}'.", str(output_file_path))
             
     except Exception as e:
         print(f"❌ Erro ao rodar Docling em '{pdf_path.name}':\n{e}")
+        return RunResult("Docling", "failed", f"Falha ao converter '{pdf_path.name}': {e}")
 
 if __name__ == "__main__":
     # Teste rápido se o script for rodado diretamente
