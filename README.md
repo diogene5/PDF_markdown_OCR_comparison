@@ -35,6 +35,21 @@ flowchart TD
 - `openai`
 - `gemini`
 
+## Qual família usar
+
+- `marker`, `mineru`, `docling`, `markitdown`
+  Use quando você quer markdown utilizável, com foco em estrutura, seções, listas, tabelas e leitura final.
+- `surya`, `tesseract`, `easyocr`
+  Use quando o PDF parece scan ou imagem e seu objetivo principal é extrair texto, não reconstruir layout final.
+- `openai`, `gemini`
+  Use quando você quer comparar entendimento visual por página e aceita custo de API e mais latência.
+
+Regra prática:
+
+- Quer markdown final para leitura ou comparação: comece por `marker` ou `mineru`.
+- Quer OCR bruto de scan: use `surya` ou o grupo `ocr`.
+- Quer ver como um modelo multimodal interpreta a página: use `cloud`.
+
 ## Como rodar tudo
 
 1. Crie e ative o ambiente virtual:
@@ -107,6 +122,26 @@ python3 scripts/run_one.py \
 source venv/bin/activate
 python3 scripts/run_one.py \
   --tool mineru \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+### Surya isolado
+
+```bash
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool surya \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+### OCR completo
+
+```bash
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool ocr \
   --input ~/Downloads/meu-pdf.pdf \
   --output ~/Desktop/pdf-tests
 ```

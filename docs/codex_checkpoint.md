@@ -1,6 +1,6 @@
 # Codex Checkpoint
 
-- Atualizado em: `2026-03-13 18:22:11 -03`
+- Atualizado em: `2026-03-13 19:16:18 -03`
 - Projeto: `PDF_markdown_OCR_comparison`
 - Branch ativa: `codex-runner-hardening-diagnostics`
 - Referencia de retomada imediata: rodar `./scripts/codex_resume.sh` para ver o `HEAD` atual
@@ -11,8 +11,9 @@
 
 - `run_cloud_apis.py` e `run_ocr_engines.py` agora processam pagina por pagina para reduzir uso de memoria.
 - O runner do Gemini foi atualizado para usar um modelo atual e o smoke test curto passou.
-- `surya` foi alinhado ao CLI instalado e `markitdown` passou a depender explicitamente do extra de PDF.
+- `surya` foi alinhado ao CLI instalado, ganhou runner isolado e agora pode ser testado via `scripts/run_one.py --tool surya`.
 - O projeto ganhou manifesto real de resultados, arquivos consolidados `document.md` e um observatorio visual em `docs/`.
+- `marker`, `mineru` e `surya` foram validados em um PDF externo de 1 pagina, com saidas geradas em `/tmp/codex-first-use`.
 - Ha blocos locais ainda nao publicados no remoto; confirme o estado exato com `./scripts/codex_resume.sh`.
 - `docs/results/` continua como saida local gerada e nao deve entrar nos commits.
 
@@ -96,3 +97,4 @@ Cada bloco deve responder tres perguntas:
 - `2026-03-13 18:20:51 -03` - antes de teste longo: smoke test da rotina de checkpoint | branch `codex-runner-hardening-diagnostics` | commit `6716d72`
 - `2026-03-13 18:21:00 -03` - `./scripts/codex_resume.sh` e `./scripts/codex_pre_long_test.sh` executados com sucesso.
 - `2026-03-13 18:22:11 -03` - commit `a10e7b6` criado para fechar o bloco de retomada segura.
+- `2026-03-13 19:16:18 -03` - `surya` isolado adicionado ao `run_one.py` e teste externo com `marker`, `mineru` e `surya` concluido em `/tmp/codex-first-use`.

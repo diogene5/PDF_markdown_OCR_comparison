@@ -10,6 +10,55 @@ Temos 3 famílias principais:
 - **OCR puro:** `surya`, `tesseract`, `easyocr`
 - **Modelos de nuvem:** `openai`, `gemini`
 
+## Quando usar cada família
+
+### Estruturais
+
+Use quando você quer um markdown que faça sentido para ler, comparar ou publicar.
+
+Bom para:
+
+- PDFs digitais com texto selecionável
+- documentos com seções, listas e tabelas
+- comparação de qualidade de markdown final
+
+Comece por:
+
+- `marker` se você quer boa preservação de estrutura e figuras
+- `mineru` se o layout é mais complexo
+- `docling` se quer markdown mais limpo
+
+### OCR puro
+
+Use quando o PDF parece um scan, uma foto de página ou um documento em que o principal é "tirar texto da imagem".
+
+Bom para:
+
+- PDF escaneado
+- imagem embutida no PDF
+- texto em página que não vem bem extraído por ferramentas estruturais
+
+Regra prática:
+
+- `surya` para OCR mais forte e mais moderno
+- `tesseract` como baseline simples
+- `easyocr` como comparação extra
+
+### Modelos de nuvem
+
+Use quando você quer que um modelo multimodal interprete visualmente a página e monte um markdown por página.
+
+Bom para:
+
+- comparar "entendimento" visual com OCR local
+- testar tabelas, diagramas e contexto visual
+- casos em que vale pagar API para comparar qualidade
+
+Ruim para:
+
+- lote grande sem controle de custo
+- uso offline
+
 ## Fluxo simples
 
 ```mermaid
@@ -110,6 +159,17 @@ python3 scripts/run_one.py \
   --output ~/Desktop/pdf-tests
 ```
 
+### Surya isolado
+
+```bash
+cd ~/projetos/PDF_markdown_OCR_comparison
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool surya \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
 ### Rodar vários de uma vez
 
 ```bash
@@ -119,6 +179,17 @@ python3 scripts/run_one.py \
   --tool marker \
   --tool mineru \
   --tool docling \
+  --input ~/Downloads/meu-pdf.pdf \
+  --output ~/Desktop/pdf-tests
+```
+
+### Rodar OCR completo
+
+```bash
+cd ~/projetos/PDF_markdown_OCR_comparison
+source venv/bin/activate
+python3 scripts/run_one.py \
+  --tool ocr \
   --input ~/Downloads/meu-pdf.pdf \
   --output ~/Desktop/pdf-tests
 ```

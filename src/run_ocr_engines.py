@@ -1,5 +1,4 @@
 import os
-import subprocess
 import shutil
 from pathlib import Path
 
@@ -24,7 +23,8 @@ except Exception as e:
     reader = None
 
 from src.run_result import RunResult, combine_status
-from src.output_helpers import combine_page_outputs, combine_surya_results
+from src.output_helpers import combine_page_outputs
+from src.run_surya import run_surya
 
 
 def iter_pdf_pages(pdf_path: Path):
@@ -85,44 +85,17 @@ def run_ocr_engines(input_pdf: str, output_dir: str) -> RunResult:
     failure_count = 0
     skipped_count = 0
     messages: list[str] = []
-    surya_command = shutil.which("surya_ocr")
-
     print(f"🔄 Extração Pure OCR: Convertendo PDF '{pdf_path.name}' para imagens...")
 
     # 1. Surya OCR - roda direto no PDF se o CLI estiver disponível.
-    if surya_command is None:
+    surya_result = run_surya(str(pdf_path), str(results_dir / "surya"))
+    messages.append(surya_result.message)
+    if surya_result.status == "success":
+        success_count += 1
+    elif surya_result.status == "skipped":
         skipped_count += 1
-        messages.append("Surya pulado: CLI 'surya_ocr' ausente.")
     else:
-        try:
-            print(f"  -> Rodando Surya CLI...")
-            surya_out = results_dir / "surya"
-            surya_out.mkdir(exist_ok=True)
-            surya_result = subprocess.run(
-                [surya_command, str(pdf_path), "--output_dir", str(surya_out)],
-                capture_output=True,
-                text=True,
-            )
-            if surya_result.returncode != 0:
-                failure_count += 1
-                stderr = surya_result.stderr.strip() or "erro sem detalhes no stderr"
-                print(f"⚠️ Surya falhou para '{pdf_path.name}': {stderr}")
-                messages.append(f"Surya falhou: {stderr}")
-            else:
-                success_count += 1
-                results_json = next(surya_out.rglob("results.json"), None)
-                if results_json is None:
-                    messages.append("Surya concluiu, mas não gerou results.json.")
-                else:
-                    combined = combine_surya_results(results_json)
-                    if combined is not None:
-                        messages.append(f"Surya concluído e consolidado em {combined.name}.")
-                    else:
-                        messages.append("Surya concluiu, mas não foi possível consolidar em document.md.")
-        except Exception as e:
-            failure_count += 1
-            messages.append(f"Surya falhou: {e}")
-            print(f"⚠️ Surya falhou para '{pdf_path.name}': {e}")
+        failure_count += 1
 
     # 2. Converte PDF para imagens para Tesseract e EasyOCR.
     if convert_from_path is None or pdfinfo_from_path is None:

@@ -14,6 +14,7 @@ RUNNERS = {
     "mineru": ("src.run_mineru", "run_mineru"),
     "docling": ("src.run_docling", "run_docling"),
     "markitdown": ("src.run_markitdown", "run_markitdown"),
+    "surya": ("src.run_surya", "run_surya"),
     "ocr": ("src.run_ocr_engines", "run_ocr_engines"),
     "cloud": ("src.run_cloud_apis", "run_cloud_apis"),
 }
@@ -55,7 +56,7 @@ def main() -> int:
         "--tool",
         action="append",
         required=True,
-        choices=["marker", "mineru", "docling", "markitdown", "ocr", "cloud", "all-local", "all"],
+        choices=["marker", "mineru", "docling", "markitdown", "surya", "ocr", "cloud", "all-local", "all"],
         help="Ferramenta a rodar. Pode repetir --tool varias vezes.",
     )
     args = parser.parse_args()
