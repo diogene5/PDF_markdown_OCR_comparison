@@ -6,3 +6,4 @@ mineru==2.7.6
 openai==2.26.0
 pdf2image==1.17.0
 pytesseract==0.3.13
+pypdf>=4.0
