@@ -1,0 +1,274 @@
+{
+  "generated_at": "2026-03-14T10:04:11.565476+00:00",
+  "tools": [
+    {
+      "id": "marker",
+      "label": "Marker",
+      "family": "Estrutural"
+    },
+    {
+      "id": "mineru",
+      "label": "MinerU",
+      "family": "Estrutural"
+    },
+    {
+      "id": "docling",
+      "label": "Docling",
+      "family": "Estrutural"
+    },
+    {
+      "id": "markitdown",
+      "label": "MarkItDown",
+      "family": "Estrutural"
+    },
+    {
+      "id": "cloud_apis/openai",
+      "label": "OpenAI",
+      "family": "Nuvem"
+    },
+    {
+      "id": "cloud_apis/gemini",
+      "label": "Gemini",
+      "family": "Nuvem"
+    },
+    {
+      "id": "ocr_engines/surya",
+      "label": "Surya",
+      "family": "OCR"
+    },
+    {
+      "id": "ocr_engines/tesseract",
+      "label": "Tesseract",
+      "family": "OCR"
+    },
+    {
+      "id": "ocr_engines/easyocr",
+      "label": "EasyOCR",
+      "family": "OCR"
+    }
+  ],
+  "pdfs": [
+    {
+      "name": "fleisher_ludwig_pediatric_emergency_8ed",
+      "available_tools": 2,
+      "outputs": {
+        "marker": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "mineru": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "docling": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "markitdown": {
+          "available": true,
+          "path": "results/markitdown/fleisher_ludwig_pediatric_emergency_8ed/fleisher_ludwig_pediatric_emergency_8ed.md",
+          "page_count": 0,
+          "format": "md",
+          "name": "fleisher_ludwig_pediatric_emergency_8ed.md"
+        },
+        "cloud_apis/openai": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "cloud_apis/gemini": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "ocr_engines/surya": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "ocr_engines/tesseract": {
+          "available": true,
+          "path": "results/ocr_engines/fleisher_ludwig_pediatric_emergency_8ed/tesseract/document.md",
+          "page_count": 0,
+          "format": "md",
+          "name": "document.md"
+        },
+        "ocr_engines/easyocr": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        }
+      }
+    },
+    {
+      "name": "material_curso_pediatria",
+      "available_tools": 2,
+      "outputs": {
+        "marker": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "mineru": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "docling": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "markitdown": {
+          "available": true,
+          "path": "results/markitdown/material_curso_pediatria/material_curso_pediatria.md",
+          "page_count": 0,
+          "format": "md",
+          "name": "material_curso_pediatria.md"
+        },
+        "cloud_apis/openai": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "cloud_apis/gemini": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "ocr_engines/surya": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "ocr_engines/tesseract": {
+          "available": true,
+          "path": "results/ocr_engines/material_curso_pediatria/tesseract/document.md",
+          "page_count": 0,
+          "format": "md",
+          "name": "document.md"
+        },
+        "ocr_engines/easyocr": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        }
+      }
+    },
+    {
+      "name": "pem_guide_12_0",
+      "available_tools": 3,
+      "outputs": {
+        "marker": {
+          "available": true,
+          "path": "results/marker/pem_guide_12_0/pem_guide_12_0.md",
+          "page_count": 0,
+          "format": "md",
+          "name": "pem_guide_12_0.md"
+        },
+        "mineru": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "docling": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "markitdown": {
+          "available": true,
+          "path": "results/markitdown/pem_guide_12_0/pem_guide_12_0.md",
+          "page_count": 0,
+          "format": "md",
+          "name": "pem_guide_12_0.md"
+        },
+        "cloud_apis/openai": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "cloud_apis/gemini": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "ocr_engines/surya": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "ocr_engines/tesseract": {
+          "available": true,
+          "path": "results/ocr_engines/pem_guide_12_0/tesseract/document.md",
+          "page_count": 0,
+          "format": "md",
+          "name": "document.md"
+        },
+        "ocr_engines/easyocr": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        }
+      }
+    },
+    {
+      "name": "urgencias_emergencias_pediatricas_eisencraft",
+      "available_tools": 2,
+      "outputs": {
+        "marker": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "mineru": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "docling": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "markitdown": {
+          "available": true,
+          "path": "results/markitdown/urgencias_emergencias_pediatricas_eisencraft/urgencias_emergencias_pediatricas_eisencraft.md",
+          "page_count": 0,
+          "format": "md",
+          "name": "urgencias_emergencias_pediatricas_eisencraft.md"
+        },
+        "cloud_apis/openai": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "cloud_apis/gemini": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "ocr_engines/surya": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        },
+        "ocr_engines/tesseract": {
+          "available": true,
+          "path": "results/ocr_engines/urgencias_emergencias_pediatricas_eisencraft/tesseract/document.md",
+          "page_count": 0,
+          "format": "md",
+          "name": "document.md"
+        },
+        "ocr_engines/easyocr": {
+          "available": false,
+          "path": null,
+          "page_count": 0
+        }
+      }
+    }
+  ]
+}
